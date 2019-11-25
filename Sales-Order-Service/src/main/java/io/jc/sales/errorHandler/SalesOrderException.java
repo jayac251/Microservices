@@ -1,7 +1,6 @@
-package io.jc.sos.errorHandler;
+package io.jc.sales.errorHandler;
 
 public class SalesOrderException extends Exception {
-
 	/**
 	 * Default Serialize
 	 */
@@ -16,5 +15,4 @@ public class SalesOrderException extends Exception {
 	}
 
 	
-
 }

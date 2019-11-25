@@ -1,7 +1,7 @@
 /**
  * 
  */
-package io.jc.sos.customer.repo;
+package io.jc.sales.repo;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

@@ -1,4 +1,4 @@
-package io.jc.sos.errorHandler;
+package io.jc.sales.errorHandler;
 public class ErrorResponse
 {
     private int status;

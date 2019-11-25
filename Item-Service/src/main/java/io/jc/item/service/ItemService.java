@@ -31,7 +31,7 @@ public class ItemService {
 	@PostConstruct
 	void initialize() {
 		Item item1 = new Item("Ponds", "Fairness Cream", "75.00");
-		Item item2 = new Item("Himalaya", "Baby Soap", "40.00");
+		Item item2 = new Item("Johnsons", "Baby Soap", "40.00");
 		itemRepository.save(item1);
 		itemRepository.save(item2);
 	}
