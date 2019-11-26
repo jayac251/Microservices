@@ -10,6 +10,8 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,6 +24,9 @@ import io.jc.sales.repo.SalesOrderRepository;
 
 @Service
 public class SalesOrderService {
+	
+	@Autowired
+	LoadBalancerClient loadBalancer;
 
 	@Autowired
 	private SalesOrderRepository sosRepository;
@@ -35,8 +40,8 @@ public class SalesOrderService {
 	@Autowired
 	RestHandler restHandler;
 
-	@Value("${jc.item.service.url}")
-	String url;
+	@Value("${jc.item.service.id}")
+	String serviceId;
 
 	@PostConstruct
 	void initialize() {
@@ -55,6 +60,14 @@ public class SalesOrderService {
 	}
 
 	public String createSalesOrder(SalesOrder order) {
+		//Get Service Instance from Ribbon
+		ServiceInstance serviceInstance = loadBalancer.choose(serviceId);
+	
+	System.out.println(serviceInstance.getUri());
+	
+	String baseUrl=serviceInstance.getUri().toString()+"/item-service/items";
+		
+		
 		String status = "";
 
 		if (order != null) {
@@ -72,7 +85,7 @@ public class SalesOrderService {
 
 							// Call Item Service to get the items available in inventory
 							List<Item> listOfItems = (List<Item>) restHandler.callRestService((restTemplate) -> {
-								Item[] items = restTemplate.getForObject(url, Item[].class);
+								Item[] items = restTemplate.getForObject(baseUrl, Item[].class);
 								return Arrays.asList(items);
 							});
 

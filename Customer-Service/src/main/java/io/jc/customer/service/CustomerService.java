@@ -1,6 +1,7 @@
 package io.jc.customer.service;
 
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,8 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 import io.jc.customer.common.mq.config.RabbitMQSender;
 import io.jc.customer.repo.Customer;
@@ -46,10 +49,12 @@ public class CustomerService {
 	 * @return Customer List
 	 * @throws Exception 
 	 */
+	 @HystrixCommand(fallbackMethod = "getCustomers_Fallback")
 	public List<Customer> getCustomers() throws Exception {
 		List<Customer> cust = new ArrayList<Customer>();
 		try {
 			cust = customerRepository.findAll();
+			
 		} catch (Exception e) {
 			log.error("Customer Repository Returned no records");
 			throw new Exception(e);
@@ -81,4 +86,13 @@ public class CustomerService {
 
 	}
 
+	 @SuppressWarnings("unused")
+	private List<Customer> getCustomers_Fallback() {
+		 
+		 List<Customer> cust = new ArrayList<Customer>();
+		 
+	       log.error("CIRCUIT BREAKER" +  "Customer Service is down!!! fallback route enabled...");
+	 
+	        return cust;
+	    }
 }
