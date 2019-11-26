@@ -15,6 +15,8 @@ import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+
 import io.jc.sales.repo.CustomerRepository;
 import io.jc.sales.repo.CustomerSOS;
 import io.jc.sales.repo.Item;
@@ -59,13 +61,14 @@ public class SalesOrderService {
 		return sales;
 	}
 
+	 @HystrixCommand(fallbackMethod = "createSales_Fallback")
 	public String createSalesOrder(SalesOrder order) {
 		//Get Service Instance from Ribbon
 		ServiceInstance serviceInstance = loadBalancer.choose(serviceId);
 	
 	System.out.println(serviceInstance.getUri());
 	
-	String baseUrl=serviceInstance.getUri().toString()+"/item-service/items";
+	String baseUrl=serviceInstance.getUri().toString()+"/item-service/item";
 		
 		
 		String status = "";
@@ -122,6 +125,13 @@ public class SalesOrderService {
 		return status;
 
 	}
+	 
+	 @SuppressWarnings("unused")
+	private String createSales_Fallback(SalesOrder order) {
+		 String status="Failed, Service Unavailable Currently, Try Again Later";
+		 
+		 return status;
+	    }
 
 	private void PopulateTables() {
 		CustomerSOS cust1 = new CustomerSOS("123@gmail.com", "Girisha", "Yadav");
